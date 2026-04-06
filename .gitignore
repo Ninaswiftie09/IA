@@ -1,0 +1,64 @@
+# ------------------------------
+# Python
+# ------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+requirements.txt
+
+# Entornos virtuales
+.venv/
+venv/
+env/
+ENV/
+
+# Distribución / build
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Logs
+*.log
+
+# ------------------------------
+# Jupyter Notebook
+# ------------------------------
+.ipynb_checkpoints/
+
+# ------------------------------
+# VS Code
+# ------------------------------
+.vscode/
+
+# ------------------------------
+# Sistema operativo
+# ------------------------------
+.DS_Store
+Thumbs.db
+
+# ------------------------------
+# Archivos temporales
+# ------------------------------
+*.tmp
+*.temp
+~$*
+*.bak
+*.swp
+
+# ------------------------------
+# Salidas generadas
+# ------------------------------
+*.html
+
+
+
+# ------------------------------
+# Modelos / resultados
+# ------------------------------
+*.pkl
+*.joblib
+*.h5
+*.hdf5
