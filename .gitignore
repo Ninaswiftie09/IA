@@ -64,3 +64,10 @@ Thumbs.db
 *.hdf5
 
 vscode/
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.csv
+
+outputs/
