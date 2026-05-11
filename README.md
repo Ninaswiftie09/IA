@@ -1,4 +1,4 @@
-## Proyecto 1
+## Proyecto 2
 
 ### Integrantes:
     Nina Nájera - 231088
