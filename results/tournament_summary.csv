@@ -1,0 +1,9 @@
+metric,value
+games,20
+alpha_beta_wins,16
+mcts_wins,4
+draws,0
+alpha_beta_avg_time,1.375502316334418
+mcts_avg_time,1.323991925450308
+alpha_beta_avg_nodes,10621.45875
+mcts_avg_nodes,894.9346130952381

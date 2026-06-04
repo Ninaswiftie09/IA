@@ -1,73 +1,61 @@
-# ------------------------------
 # Python
-# ------------------------------
 __pycache__/
 *.py[cod]
-*$py.class
 *.pyo
 *.pyd
-requirements.txt
-
-# Entornos virtuales
-.venv/
-venv/
-env/
-ENV/
-
-# Distribución / build
-build/
-dist/
+.Python
+*.egg
 *.egg-info/
+dist/
+build/
+eggs/
+wheels/
+*.whl
 .eggs/
 
-# Logs
-*.log
+# Entornos virtuales
+venv/
+env/
+.venv/
+.env/
+ENV/
 
-# ------------------------------
-# Jupyter Notebook
-# ------------------------------
-.ipynb_checkpoints/
-
-# ------------------------------
-# VS Code
-# ------------------------------
+# IDEs
 .vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
 
-# ------------------------------
 # Sistema operativo
-# ------------------------------
 .DS_Store
 Thumbs.db
+desktop.ini
 
-# ------------------------------
-# Archivos temporales
-# ------------------------------
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Logs y temporales
+*.log
 *.tmp
-*.temp
-~$*
 *.bak
 *.swp
+*.swo
 
-# ------------------------------
-# Salidas generadas
-# ------------------------------
-*.html
+# Pygame / compilados
+*.pyc
+*.so
 
+# results/
 
-
-# ------------------------------
-# Modelos / resultados
-# ------------------------------
-*.pkl
-*.joblib
-*.h5
-*.hdf5
-
-vscode/
-*.png
-*.jpg
-*.jpeg
-*.gif
-*.csv
-
-outputs/
+# Overleaf / LaTeX
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+*.nav
+*.snm
+*.vrb
