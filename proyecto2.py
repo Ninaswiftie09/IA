@@ -6,47 +6,66 @@ Problema 1: Generación de laberintos (Kruskal y Prim)
 Problema 2: Solución de laberinto 60×80 (BFS, DFS, Dijkstra, A*)
 Problema 3: Comparación de algoritmos en 25 laberintos 45×55
 """
+import random # acá se importa random para mezclar aristas y escoger celdas/paredes al azar
+import heapq # acá se importa heapq para colas de prioridad; se usa después en Dijkstra y A
+import time # acá se importa time para medir tiempos de ejecución en los algoritmos
+import math # acá se importa math para operaciones matemáticas, como calcular filas en visualizaciones
+import matplotlib # acá se importa matplotlib para configurar cómo se generan las gráficas
+matplotlib.use('Agg') # acá se usa un backend no interactivo para guardar imágenes sin abrir ventanas
+import matplotlib.pyplot as plt # acá se importa pyplot para crear figuras, subplots y guardar imágenes
+import matplotlib.patches as mpatches # acá se importa patches para crear elementos de leyenda en las gráficas
+import matplotlib.animation as animation # acá se importa animation para poder generar animaciones si se necesitan
+import numpy as np  # acá se importa numpy para manejar el laberinto como una matriz
+from collections import deque # acá se importa deque para usar colas eficientes; se usa después en BFS
 
-import random
-import heapq
-import time
-import math
-import matplotlib
-matplotlib.use('Agg')  # Non-interactive backend for saving figures
-import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
-import matplotlib.animation as animation
-import numpy as np
-from collections import deque
 
 # ============================================================
 # PROBLEMA 1: GENERACIÓN DE LABERINTOS
 # ============================================================
 
-# ---- Estructura Union-Find (para Kruskal y Boruvka) ----
+
+# ---- Estructura Union-Find para Kruskal ----
 class DisjointSet:
     def __init__(self, n):
+        # acá se crea una lista donde cada celda empieza siendo su propio padre
         self.parent = list(range(n))
+
+        # acá se guarda el rango de cada conjunto para hacer uniones más eficientes
         self.rank = [0] * n
 
     def find(self, x):
+        # acá se busca el representante del conjunto al que pertenece x
         if self.parent[x] != x:
+            # acá se aplica compresión de caminos para acelerar futuras búsquedas
             self.parent[x] = self.find(self.parent[x])
+
         return self.parent[x]
 
     def union(self, a, b):
+        # acá se buscan los representantes de las dos celdas
         ra, rb = self.find(a), self.find(b)
+
+        # acá se verifica si ya pertenecen al mismo conjunto
         if ra == rb:
             return False
+
+        # acá se une el árbol más pequeño al más grande usando el rango
         if self.rank[ra] < self.rank[rb]:
             ra, rb = rb, ra
+
+        # acá se hace la unión de los conjuntos
         self.parent[rb] = ra
+
+        # acá se aumenta el rango si ambos conjuntos tenían el mismo tamaño aproximado
         if self.rank[ra] == self.rank[rb]:
             self.rank[ra] += 1
+
+        # acá se retorna True porque sí se logró unir sin formar ciclo
         return True
 
 
 def cell_idx(r, c, cols):
+    # acá se convierte una celda con fila y columna a un índice único
     return r * cols + c
 
 
@@ -55,140 +74,223 @@ def generate_maze_kruskal(rows, cols, animate=False):
     """
     Genera un laberinto usando el algoritmo de Kruskal.
     Representación: 0 = pasillo, 1 = pared.
-    El laberinto tiene celdas en posiciones (2r, 2c) y paredes entre ellas.
     """
-    # Grid de tamaño (2*rows+1) x (2*cols+1)
+
+    # acá se calcula el tamaño real de la matriz expandida del laberinto
     H = 2 * rows + 1
     W = 2 * cols + 1
+
+    # acá se crea el laberinto lleno de paredes
     maze = np.ones((H, W), dtype=int)
 
-    # Abrir todas las celdas
+    # acá se abren las posiciones que representan las celdas reales del laberinto
     for r in range(rows):
         for c in range(cols):
             maze[2*r+1][2*c+1] = 0
 
-    # Crear lista de aristas entre celdas adyacentes
+    # acá se crea la lista de aristas entre celdas vecinas
     edges = []
+
     for r in range(rows):
         for c in range(cols):
+
+            # acá se agrega una conexión vertical con la celda de abajo
             if r + 1 < rows:
                 edges.append((r, c, r+1, c))
+
+            # acá se agrega una conexión horizontal con la celda de la derecha
             if c + 1 < cols:
                 edges.append((r, c, r, c+1))
 
+    # acá se mezclan las aristas para que el laberinto salga aleatorio
     random.shuffle(edges)
-    ds = DisjointSet(rows * cols)
-    frames = []  # Para animación
 
+    # acá se crea la estructura Union-Find para controlar los conjuntos de celdas
+    ds = DisjointSet(rows * cols)
+
+    # acá se guardan estados intermedios si se quiere animar la construcción
+    frames = []
+
+    # acá se recorren todas las posibles conexiones entre celdas
     for r1, c1, r2, c2 in edges:
+
+        # acá se verifica si las celdas están en conjuntos diferentes
         if ds.union(cell_idx(r1, c1, cols), cell_idx(r2, c2, cols)):
-            # Abrir la pared entre (r1,c1) y (r2,c2)
+
+            # acá se calcula la posición de la pared que está entre las dos celdas
             wr = r1 + r2 + 1
             wc = c1 + c2 + 1
+
+            # acá se elimina la pared, convirtiéndola en pasillo
             maze[wr][wc] = 0
+
+            # acá se guarda una copia del laberinto si se activó la animación
             if animate:
                 frames.append(maze.copy())
 
+    # acá se retorna el laberinto final y los frames de construcción
     return maze, frames
 
 
 # ---- Algoritmo de Prim ----
 def generate_maze_prim(rows, cols, animate=False):
     """
-    Genera un laberinto usando el algoritmo de Prim (versión aleatoria).
+    Genera un laberinto usando el algoritmo de Prim en versión aleatoria.
     """
+
+    # acá se calcula el tamaño real de la matriz expandida
     H = 2 * rows + 1
     W = 2 * cols + 1
+
+    # acá se crea el laberinto lleno de paredes
     maze = np.ones((H, W), dtype=int)
 
-    # Celda inicial aleatoria
+    # acá se escoge una celda inicial aleatoria
     sr, sc = random.randint(0, rows-1), random.randint(0, cols-1)
+
+    # acá se abre la celda inicial en la matriz
     maze[2*sr+1][2*sc+1] = 0
+
+    # acá se crea el conjunto de celdas ya visitadas
     visited = set()
     visited.add((sr, sc))
 
-    # Paredes adyacentes a la celda inicial
+    # acá se guardan las paredes candidatas que rodean la celda inicial
     walls = []
-    for dr, dc in [(-1,0),(1,0),(0,-1),(0,1)]:
-        nr, nc = sr+dr, sc+dc
+
+    for dr, dc in [(-1,0), (1,0), (0,-1), (0,1)]:
+        # acá se calcula la posición de una celda vecina
+        nr, nc = sr + dr, sc + dc
+
+        # acá se verifica que la celda vecina esté dentro del laberinto
         if 0 <= nr < rows and 0 <= nc < cols:
             walls.append((sr, sc, nr, nc))
 
+    # acá se guardan estados intermedios si se quiere animar la construcción
     frames = []
 
+    # acá se repite el proceso mientras existan paredes candidatas
     while walls:
+
+        # acá se escoge una pared aleatoria de la lista
         idx = random.randint(0, len(walls)-1)
         r1, c1, r2, c2 = walls.pop(idx)
 
+        # acá se verifica si la celda del otro lado todavía no fue visitada
         if (r2, c2) not in visited:
+
+            # acá se marca la nueva celda como visitada
             visited.add((r2, c2))
+
+            # acá se abre la nueva celda en la matriz
             maze[2*r2+1][2*c2+1] = 0
-            # Abrir pared
+
+            # acá se calcula la pared que está entre la celda anterior y la nueva
             wr = r1 + r2 + 1
             wc = c1 + c2 + 1
+
+            # acá se elimina la pared para conectar ambas celdas
             maze[wr][wc] = 0
 
+            # acá se guarda una copia del laberinto si se activó la animación
             if animate:
                 frames.append(maze.copy())
 
-            # Agregar nuevas paredes
-            for dr, dc in [(-1,0),(1,0),(0,-1),(0,1)]:
-                nr, nc = r2+dr, c2+dc
+            # acá se agregan las paredes vecinas de la nueva celda
+            for dr, dc in [(-1,0), (1,0), (0,-1), (0,1)]:
+                nr, nc = r2 + dr, c2 + dc
+
+                # acá se agregan solo las paredes que llevan a celdas no visitadas
                 if 0 <= nr < rows and 0 <= nc < cols and (nr, nc) not in visited:
                     walls.append((r2, c2, nr, nc))
 
+    # acá se retorna el laberinto final y los frames de construcción
     return maze, frames
 
 
 # ---- Visualización de construcción de laberintos ----
 def visualize_maze_construction(rows=15, cols=15, save_path="construccion_laberintos.png"):
     """
-    Genera y compara visualmente la construcción de laberintos con Kruskal y Prim.
-    Muestra estados intermedios del proceso de construcción.
+    Genera una comparación visual de la construcción con Kruskal y Prim.
     """
+
+    # acá se muestra en consola que inicia la generación de la visualización
     print("Generando laberintos para visualización de construcción...")
 
+    # acá se crea una figura con 2 filas y 4 columnas
     fig, axes = plt.subplots(2, 4, figsize=(20, 10))
-    fig.patch.set_facecolor('#1a1a2e')
-    fig.suptitle('Construcción de Laberintos: Kruskal vs Prim', 
-                 fontsize=18, fontweight='bold', color='white', y=1.02)
 
-    # Generar frames para Kruskal
+    # acá se cambia el color de fondo de la figura
+    fig.patch.set_facecolor('#1a1a2e')
+
+    # acá se coloca el título general de la visualización
+    fig.suptitle(
+        'Construcción de Laberintos: Kruskal vs Prim',
+        fontsize=18,
+        fontweight='bold',
+        color='white',
+        y=1.02
+    )
+
+    # acá se genera el laberinto con Kruskal y se guardan sus frames
     _, k_frames = generate_maze_kruskal(rows, cols, animate=True)
-    # Generar frames para Prim
+
+    # acá se genera el laberinto con Prim y se guardan sus frames
     _, p_frames = generate_maze_prim(rows, cols, animate=True)
 
+    # acá se obtiene la cantidad de frames generados por cada algoritmo
     k_len = len(k_frames)
     p_len = len(p_frames)
 
-    # Seleccionar 4 frames representativos de cada uno
+    # acá se seleccionan cuatro momentos importantes de Kruskal
     k_indices = [0, k_len//4, k_len//2, k_len-1]
+
+    # acá se seleccionan cuatro momentos importantes de Prim
     p_indices = [0, p_len//4, p_len//2, p_len-1]
+
+    # acá se definen las etiquetas de cada etapa
     labels = ['Inicio', '25%', '50%', 'Final']
 
+    # acá se definen los mapas de color para cada algoritmo
     cmap_k = plt.cm.get_cmap('Blues_r')
     cmap_p = plt.cm.get_cmap('Oranges_r')
 
+    # acá se dibujan los cuatro estados de ambos algoritmos
     for col_i, (ki, pi, label) in enumerate(zip(k_indices, p_indices, labels)):
-        # Fila 0: Kruskal
+
+        # acá se dibuja Kruskal en la primera fila
         ax = axes[0][col_i]
         ax.imshow(k_frames[ki], cmap=cmap_k, vmin=0, vmax=1)
         ax.set_title(f'Kruskal - {label}', color='white', fontsize=11)
         ax.axis('off')
         ax.set_facecolor('#1a1a2e')
 
-        # Fila 1: Prim
+        # acá se dibuja Prim en la segunda fila
         ax = axes[1][col_i]
         ax.imshow(p_frames[pi], cmap=cmap_p, vmin=0, vmax=1)
         ax.set_title(f'Prim - {label}', color='white', fontsize=11)
         ax.axis('off')
         ax.set_facecolor('#1a1a2e')
 
+    # acá se ajustan los espacios de la figura
     plt.tight_layout()
-    plt.savefig(save_path, dpi=150, bbox_inches='tight',
-                facecolor='#1a1a2e', edgecolor='none')
+
+    # acá se guarda la imagen final en la ruta indicada
+    plt.savefig(
+        save_path,
+        dpi=150,
+        bbox_inches='tight',
+        facecolor='#1a1a2e',
+        edgecolor='none'
+    )
+
+    # acá se cierra la figura para liberar memoria
     plt.close()
+
+    # acá se imprime la ruta donde se guardó la imagen
     print(f"  Guardado: {save_path}")
+
+    # acá se retorna la ruta del archivo guardado
     return save_path
 
 
