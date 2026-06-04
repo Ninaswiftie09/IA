@@ -5,7 +5,9 @@ Curso de Inteligencia Artificial 2026, Universidad del Valle de Guatemala.
 El proyecto implementa un agente inteligente para jugar Othello (Reversi) en un tablero 8×8. El motor usa algoritmos de búsqueda adversaria con heurísticas adaptadas por fase de juego, y la interfaz gráfica permite partidas entre humanos, entre IA o mixtas.
 
 ---
-
+## Enlaces 
+    Vídeo: 
+    Repositorio: https://github.com/Ninaswiftie09/IA/tree/Proyecto3
 ## Estructura del proyecto
 
 ```
