@@ -6,7 +6,7 @@ El proyecto implementa un agente inteligente para jugar Othello (Reversi) en un 
 
 ---
 ## Enlaces 
-    Vídeo: 
+    Vídeo: https://youtu.be/qasFT_ufUeA
     Repositorio: https://github.com/Ninaswiftie09/IA/tree/Proyecto3
 ## Estructura del proyecto
 
